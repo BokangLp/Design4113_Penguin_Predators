@@ -5,6 +5,8 @@ import io
 import cv2
 import os
 import RPi.GPIO as GPIO
+import base64
+import json
 
 pin_num = 24
 GPIO.setmode(GPIO.BCM)
@@ -25,7 +27,7 @@ controls = {"AeEnable": True,
 		#"ExposureTime": 50000,
 	#"AnalogueGain": 5.0
 	"Brightness":0.2,	# -1.0 -> 1.0
-	"Contrast":1.3,		# 0.0 -> 2.0
+	"Contrast":1.0,		# 0.0 -> 2.0
 	"Saturation":1.0	# 0.0 -> 2.0
 }
 picam2.set_controls(controls)
@@ -33,7 +35,7 @@ picam2.set_controls({"AwbEnable": True})	# Enable auto white balance
 
 # Connect to pc
 HOST = '192.168.137.1'
-PORT = 5555
+PORT = 5557
 
 # Create and connect socket
 #sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -50,6 +52,7 @@ def capture_and_send():
 		print("Capturing image...")
 		image = picam2.capture_array()
 		print("Image captured!")
+		local_time = time.localtime()		# Get current local time
 	except Exception as e:
 		print(f"Camera capture failed: {e}")
 	
@@ -61,16 +64,22 @@ def capture_and_send():
 	if not success:
 		print("Failed to encode image")
 		return
-	image_bytes = encode_image.tobytes()
+	image_bytes = base64.b64encode(encode_image.tobytes()).decode('utf-8')
 	print("Image successfully encode as JPEG")
-
-	# Send image size first
-	sock.sendall(len(image_bytes).to_bytes(4, 'big'))
-	print("Image size send successfully")
 	
-	#send image data
-	sock.sendall(image_bytes)
-	print("Image sent!")
+	# Data sent to the server
+	data =  {
+		"timeStamp": time.strftime("%Y-%m-%d %H:%M:%S",local_time),
+		"image_size": len(encode_image),
+		"image": image_bytes  
+	}
+
+	# Serialize the data
+	json_data = json.dumps(data).encode('utf-8')
+	
+	# Send data to the server
+	sock.sendall(json_data)
+	print("Data sent!")
 
 # Execute capture and send
 num_files = 0
