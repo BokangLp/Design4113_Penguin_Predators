@@ -1,32 +1,25 @@
-import os
 import time
 import RPi.GPIO as GPIO
 
-# Initialise necessary pins (BCM configuration used)
-speakerPin =  12
-motorPin = 13
-
-# Setting up the GPIO pins
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(speakerPin,GPIO.OUT) # PWM for speaker board pin 32 (BCM 12)
-GPIO.setup(motorPin, GPIO.OUT) # PWM for motors board pin 33 (BCM 13)
-
 # Drive the speakers using specified frequency(Hz) and duty cycle (as a decimal)
-def speakerDrive(frequency,DutyCycle):
+def speakerDrive(frequency,DutyCycle,speaker_Pin):
 	timeON = 1/frequency * DutyCycle	# Calculate time high
 	timeOFF = 1/frequency * (1-DutyCycle)	# Calculate time  Low
-	GPIO.output(speakerPin,GPIO.HIGH)	# Set pin High
+	GPIO.output(speaker_Pin,GPIO.HIGH)	# Set pin High
 	time.sleep(timeON)			# Wait for a duration of timeON
-	GPIO.output(speakerPin,GPIO.LOW)	# Set pin low
+	GPIO.output(speaker_Pin,GPIO.LOW)	# Set pin low
 	time.sleep(timeOFF)			# wait for ad duration of timeOFF
 
-def motorDrive(frequency,DutyCycle):
+def ledDrive(frequency,DutyCycle,LED_Pin):
 	timeON = 1/frequency * DutyCycle
 	timeOFF = 1/frequency * (1-DutyCycle)
-	GPIO.output(motorPin,GPIO.HIGH)
+	GPIO.output(LED_Pin,GPIO.HIGH)
 	time.sleep(timeON)
-	GPIO.output(motorPin, GPIO.LOW)
+	GPIO.output(LED_Pin, GPIO.LOW)
 	time.sleep(timeOFF)
+
+def motorDrive(motor_pin):
+	GPIO.output(motor_pin,GPIO.HIGH)
 
 if __name__ == "__main__":
 	try:
