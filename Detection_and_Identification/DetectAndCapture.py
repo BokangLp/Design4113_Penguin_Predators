@@ -19,16 +19,11 @@ def initCam():
 	time.sleep(5)
 
 	# Update camera settings
-	controls = {"AeEnable": True,
-		"Brightness":0.2,	# -1.0 -> 1.0
-		"Contrast":1.0,		# 0.0 -> 2.0
-		"Saturation":1.0	# 0.0 -> 2.0
-	}
-	picam2.set_controls(controls)
 	picam2.set_controls({"AwbEnable": True})	# Enable auto white balance
+	return(picam2)
 
 # Capture and send image data
-async def capture_and_save():
+async def capture_and_save(picam2):
 	try:	
 		# Capture image
 		print("Capturing image...")
@@ -40,11 +35,23 @@ async def capture_and_save():
 		image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
 		# Save the image immediately after conversion
-		filename = time.strftime("captured_image_%Y%m%d_%H%M%S.jpg", local_time)
+		filename = time.strftime("Image_%Y%m%d_%H%M%S.jpg", local_time)
 		cv2.imwrite(filename, image)
 		return(filename)
 	
 	except Exception as e:
-		print(f"Error during sending of data: {e}")
+		print(f"Error when capturing and saving image: {e}")
 		await asyncio.sleep(1)
 
+
+async def main():
+	try:
+		picam2 = initCam()
+		log_time = time.localtime()
+		image_name = await capture_and_save(picam2)
+		print(f"Image saved as {image_name}")
+	except Exception as e:
+		print(f"Excption: {e}")
+
+if __name__ == "__main__":
+	asyncio.run(main())
