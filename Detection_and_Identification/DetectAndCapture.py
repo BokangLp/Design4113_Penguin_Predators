@@ -37,7 +37,7 @@ async def capture_and_save(picam2):
 		# Save the image immediately after conversion
 		filename = time.strftime("Image_%Y%m%d_%H%M%S.jpg", local_time)
 		cv2.imwrite(filename, image)
-		return(filename)
+		return(image,filename)
 	
 	except Exception as e:
 		print(f"Error when capturing and saving image: {e}")
