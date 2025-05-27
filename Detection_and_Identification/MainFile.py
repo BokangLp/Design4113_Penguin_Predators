@@ -29,7 +29,7 @@ GPIO.setup(motor_pin, GPIO.OUT)
 #Main function
 async def main():
 	# Initial responses
-	response = [[500,0.5],[200,0.5],[50,0.5]]
+	response = [[500,40],[200,60],[50,80]]
 	image = None
 	timestamp = None
 	img_class = ""
@@ -59,17 +59,17 @@ async def main():
 				if int(time.strftime("%H", timestamp)) >= 18 or int(time.strftime("%H",timestamp))<=6:
 					Led_response = response[random.randint(0,10)%3]
 				speaker_response = response[random.randint(0,10)%3]
-				DeterrenceCode.ledDrive(Led_response[0],Led_response[1],LED_pin)
-				DeterrenceCode.speakerDrive(speaker_response[0],speaker_response[1],speaker_pin)
+				pwm_12 = DeterrenceCode.ledDrive(Led_response[0],Led_response[1],LED_pin)
+				pwm_13 = DeterrenceCode.speakerDrive(speaker_response[0],speaker_response[1],speaker_pin)
 				DeterrenceCode.motorDrive(motor_pin)
 				while pin_status:
 					pin_status = GPIO.input(input_pin)
+				time.sleep(10)
 				endTime = time.time()
-				GPIO.output(LED_pin,GPIO.LOW)
-				GPIO.output(speaker_pin,GPIO.LOW)
+				pwm_13.stop()
+				pwm_12.stop()
 				GPIO.output(motor_pin,GPIO.LOW)
 				duration = endTime - startTime
-			duration = duration/1000        # Convert duration to seconds
 			deterrence = {"LED": Led_response,
 				"Speaker": speaker_response,
 				"motor": "ON"}
