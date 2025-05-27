@@ -29,6 +29,6 @@ async def classify_image(image): # or use imagepath
     predicted_class = np.argmax(output_data)
     confidence = np.max(output_data)
 
-    class_labels = ['Penguin', 'Badger']  # Adjust if different
+    class_labels = ['Badger','Penguin']  #Two classes
     return class_labels[predicted_class]
 
