@@ -7,7 +7,7 @@ import time
 import traceback
 
 # Data sending function
-async def send_detection_data(image,image_name):
+async def send_detection_data(image,image_name,deterrence,duration):
 	# Socket information
 	server_ip = "192.168.137.1"
 	port = 5555
@@ -27,8 +27,9 @@ async def send_detection_data(image,image_name):
 		# Data sent to the server
 		data =  {
 			"image_name": image_name,
-			"image": image_bytes  
-		}
+			"image": image_bytes,
+			"deterrence":deterrence,
+			"duration":duration}
 
 		# Serialize the data
 		json_data = json.dumps(data).encode('utf-8')
